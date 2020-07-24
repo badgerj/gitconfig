@@ -1,0 +1,301 @@
+[alias]
+    ################
+    # Commit related
+    ################
+    amend = commit --amend
+    ci    = commit
+    civ   = commit -v
+    co    = checkout
+    fix   = "!f() { git commit -a --fixup=HEAD; git rebase -i HEAD~2 --autosquash; }; f"
+    rprune = remote prune origin #delete unused remote refs
+
+    ###############
+    # Clean related
+    ###############
+    # Force remove of all *untracked* files and directories.
+    cleanall = clean -fd
+
+    ###############
+    # Force related
+    ###############
+    # To fetch forcefully
+    ff   = fetch --force
+    # To force a rewrite in history
+    # Need to follow by an upstream branch name
+    rh    = reset --hard
+    # To force a rewrite in history of all @{upstream} or @{u}
+    rha   = reset --hard @{upstream}
+
+    ###############
+    # Graph/Log related
+    ###############
+    # Graph current working branch
+    # Line 1  : short hash, date, relative date, branch/tag
+    # Line 2  : first commit line (subject), author
+    # Line 3-n: commit body
+    graph = !git log \
+            --date=local \
+            --graph \
+            --format=format:"\"$(git config --get format.long)"\" --abbrev-commit
+
+    # Graph *ALL* branches
+    # Line 1  : short hash, date, relative date, branch/tag
+    # Line 2  : first commit line (subject), author
+    # Line 3-n: commit body
+    graphall = !git log \
+            --all \
+            --date=local \
+            --graph \
+            --format=format:"\"$(git config --get format.long)"\" --abbrev-commit
+
+    # Graph current working branch
+    # Line 1  : short hash, relative date, first commit line (subject), author, branch/tag
+    gshort = !git log \
+            --date=local \
+            --graph \
+            --format=format:"\"$(git config --get format.short)"\" --abbrev-commit
+
+    # Graph *ALL* branches
+    # Line 1  : short hash, relative date, first commit line (subject), author, branch/tag
+    gshortall = !git log \
+            --all \
+            --date=local \
+            --graph \
+            --format=format:"\"$(git config --get format.short)"\" --abbrev-commit
+
+#The placeholders are:
+#?    %H: commit hash
+#x    %h: abbreviated commit hash
+#?    %T: tree hash
+#?    %t: abbreviated tree hash
+#?    %P: parent hashes
+#?    %p: abbreviated parent hashes
+#?    %an: author name
+#?    %aN: author name (respecting .mailmap, see git-shortlog(1) or git-blame(1))
+#?    %ae: author email
+#?    %aE: author email (respecting .mailmap, see git-shortlog(1) or git-blame(1))
+#?    %ad: author date (format respects --date= option)
+#x    %aD: author date, RFC2822 style
+#x    %ar: author date, relative
+#?    %at: author date, UNIX timestamp
+#?    %ai: author date, ISO 8601 format
+#?    %cn: committer name
+#?    %cN: committer name (respecting .mailmap, see git-shortlog(1) or git-blame(1))
+#?    %ce: committer email
+#?    %cE: committer email (respecting .mailmap, see git-shortlog(1) or git-blame(1))
+#?    %cd: committer date
+#?    %cD: committer date, RFC2822 style
+#?    %cr: committer date, relative
+#?    %ct: committer date, UNIX timestamp
+#?    %ci: committer date, ISO 8601 format
+#x    %d: ref names, like the --decorate option of git-log(1)
+#?    %e: encoding
+#?    %s: subject
+#?    %f: sanitized subject line, suitable for a filename
+#?    %b: body
+#?    %N: commit notes
+#?    %gD: reflog selector, e.g., refs/stash@{1}
+#?    %gd: shortened reflog selector, e.g., stash@{1}
+#?    %gs: reflog subject
+#?    %Cred: switch color to red
+#?    %Cgreen: switch color to green
+#?    %Cblue: switch color to blue
+#?    %Creset: reset color
+#?    %C(...): color specification, as described in color.branch.* config option
+#?    %m: left, right or boundary mark
+#x    %n: newline
+#?    %%: a raw %
+#?    %x00: print a byte from a hex code
+#?    %w([<w>[,<i1>[,<i2>]]]): switch line wrapping, like the -w option of git-shortlog(1).
+
+    ###############
+    # Index related
+    ###############
+    # update index assume unchanged <filename>
+    # Ex: git update-index --assume-unchanged bin/react-build.sh
+    unch = update-index --assume-unchanged
+    # update index no assume unchanged <filename>
+    # Ex: git update-index --no-assume-unchanged bin/react-build.sh
+    nunch = update-index --no-assume-unchanged
+    # list assume unchanged
+    # Ex: git ls-files -v | grep "^h"
+    lunch = ls-files -v
+
+    ###############
+    # Miscelaneous
+    ###############
+    master = checkout master
+    smoketest = review -t smoketest
+
+    ##############
+    # Show/Diff related
+    ##############
+    # Show pathnames of files changed in previous commit
+    sno   = show --pretty="format:" --name-only  # show name only
+    dno   = diff --pretty="format:" --name-only  # diff name only
+    dc    = diff --cached                        # diff cached
+    ds    = diff --cached                        # diff show cached
+    stat  = diff --stat HEAD~1                   # diff stats
+    # diff no white
+    dnw   = git diff --ignore-space-at-eol -b -w --ignore-blank-lines
+    # show recent branches
+    recent = ! git for-each-ref --sort=-committerdate refs/heads/ --color=always --format="\"$(git config --get format.recent)"\" --count=20 | column -ts '|'
+    recentnum = "! f() { \
+                 git for-each-ref --sort=-committerdate refs/heads/ --color=always --format="\"$(git config --get format.recent)"\" --count=$1 | column -ts '|'; \
+                }; f"
+    recentnumnc = "! f() { \
+                   git for-each-ref --sort=-committerdate refs/heads/ --color=always --format='%(refname:short)' --count=$1; \
+                  }; f"
+    recentco = "! f() { \
+                git recentnumnc $1 > /tmp/git_recentco.txt; \
+                git co `sed -n $1p /tmp/git_recentco.txt`; \
+                rm /tmp/git_recentco.txt; \
+               }; f"
+    cor = ! git recentco
+
+    # Diff Unmerged Name Only
+    # --diff-filter=[ACDMRTUXB*]
+    # Select only files that are Added (A), Copied (C), Deleted (D),
+    # Modified (M), Renamed (R),
+    # have their type (i.e. regular file, symlink, submodule, ...) changed (T),
+    # are Unmerged (U), are Unknown (X), or have had their pairing Broken (B).
+    duno  = diff --name-only --diff-filter=U
+
+    # Git stash show verbose (show not just summary, but the diff)
+    ssv   = stash show -v
+
+
+    ##############
+    # Submodule related
+    ##############
+    pullall   = !git pull && git submodule update --init
+    substat   = submodule status
+    subup     = submodule update --init
+    subprune  = submodule foreach git remote prune origin
+
+# via @afuller
+    # git rebase -i HEAD~n --onto origin/release/19.08
+
+# via @Waris Boonyasiriwat
+    # git log -p -S "Subproject commit <hash>"
+    search = "! f() { \
+              git log -p -S $1; \
+              }; f"
+
+# via @alexd
+
+    # Roll commits forward
+    roll-commits = "! f() { \
+                    num=${1:-2}; \
+                    tag=$(date +"tag-%s"); \
+                    git tag $tag; \
+                    git reset --hard HEAD~${num}; \
+                    for i in $(seq $((num-2)) 0); do \
+                    git cherry-pick ${tag}~${i}; \
+                    done; \
+                    git cherry-pick ${tag}~$((num-1)); \
+                    git tag -d ${tag}; \
+                    }; f"
+
+    # Unroll commits
+    unroll-commits = "! f() { \
+                      num=${1:-2}; \
+                      tag=$(date +"tag-%s"); \
+                      git tag $tag; \
+                      git reset --hard HEAD~${num}; \
+                      git cherry-pick ${tag}; \
+                      for i in $(seq $((num-1)) 1); do \
+                      git cherry-pick ${tag}~${i}; \
+                      done; \
+                      git tag -d ${tag}; \
+                      }; f"
+
+    # Swap commits
+    swap-commits = "! f() { git roll-commits 2; }; f"
+
+    # Undo commits specified by $* and then recommit the rest.
+    undo = "! f() { msg_file=$(date +"file-%s"); \
+            git show -s --format=%B HEAD > $msg_file; \
+            git reset HEAD~1 --soft; \
+            git reset HEAD $*; \
+            git commit -F $msg_file; \
+            rm $msg_file; \
+            }; f"
+
+    # moves the specified commit to HEAD:
+    promote-commit = "! f() { \
+                      num=$(($(git rev-list --count HEAD) - $(git rev-list --count ${1}) + 1)); \
+                      git roll-commits ${num}; \
+                      }; f"
+
+    # And moves HEAD after the specified commit:
+    demote-commit = "! f() { \
+                     num=$(($(git rev-list --count HEAD) - $(git rev-list --count ${1}) + 1)); \
+                     git unroll-commits ${num}; \
+                     }; f"
+
+[blame]
+    date = short
+
+[checkout]
+    defaultRemote=origin
+
+[color]
+    branch  = auto
+    diff    = auto
+    status  = auto
+    ui      = auto
+
+[core]
+    editor = vim
+    excludesfile = ~/.gitignore
+    pager = less -FRSX
+
+[credential]
+    # OSX
+    # helper = osxkeychain
+    # Ubuntu
+    helper = /usr/share/doc/git/contrib/credential/gnome-keyring/git-credential-gnome-keyring
+
+[debug]
+     # There are a few GIT_TRACE options, beyond the core one. Here's the über-verbose option:
+     #set -x; GIT_TRACE=2 GIT_CURL_VERBOSE=2 GIT_TRACE_PERFORMANCE=2 GIT_TRACE_PACK_ACCESS=2 GIT_TRACE_PACKET=2 GIT_TRACE_PACKFILE=2 GIT_TRACE_SETUP=2 GIT_TRACE_SHALLOW=2 git pull origin master -v -v; set +x
+     #set -x; GIT_TRACE=2 GIT_CURL_VERBOSE=2 GIT_TRACE_PERFORMANCE=2 GIT_TRACE_PACK_ACCESS=2 GIT_TRACE_PACKET=2 GIT_TRACE_PACKFILE=2 GIT_TRACE_SETUP=2 GIT_TRACE_SHALLOW=2 git status -v; set +x
+
+[diff]
+    tool = vimdiff
+    renameLimit = 1000
+
+[filter "clang-format-6.0"]
+    # To auto format C/C++
+    clean = clang-format-6.0 -style=file -fallback-style=none -assume-filename=%f
+
+[format]
+    recent = %(color:red bold)%(refname:short)%(color:reset) | %(color:green)%(authorname) | %(color:blue)%(committerdate:iso)
+    short = %C(blue)%h%C(reset) - %C(green)(%ar)%C(white) %s %C(reset)- %C(green)%an %C(red bold)%d
+    long = %C(blue)%h%C(reset) - %C(cyan)%aD %C(green)(%ar)%C(red bold)%d%n\
+%C(white)%w(120,10,0)%s %C(reset)- %C(green)%an %n\
+%C(reset)%w(82,10,10)%b
+
+[instaweb]
+    local = true
+    httpd = webrick
+
+[merge]
+    tool = vimdiff
+    conflictstyle = diff3
+    # At teradici people typically git fetch --all; git co master; git pull;
+    # git co feature/bug; git merge master;
+
+[push]
+    default = simple
+
+[pull]
+    rebase = true
+
+[submodule]
+    recurse = true
+
+[user]
+    name = <YOUR NAME>
+    email = <your user>@teradici.com
