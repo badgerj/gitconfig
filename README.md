@@ -39,6 +39,7 @@ Users appreciate release notes as you update your extension.
 Thanks to the following who have helped contriubte in alpha order:
 - @afuller
 - @alexd
+- @bdyck
 - @csd
 - @jchiu
 - @wboonyasiriwat

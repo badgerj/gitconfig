@@ -1,4 +1,15 @@
 [alias]
+
+    ################
+    # branch related
+    ################
+    # via @bdyck
+    bl = "! f() { git branch -a -l $1 --sort=-version:refname; }; f"
+    bla = branch -a
+    blr = branch -l 'release/*' --sort=-version:refname
+    # gets the default branch (via stackoverflow: https://stackoverflow.com/questions/28666357/how-to-get-default-git-branch)
+    bdefault = "! f() { git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'; }; f"
+
     ################
     # Commit related
     ################
@@ -20,6 +31,8 @@
     ###############
     # To fetch forcefully
     ff   = fetch --force
+    # To push "nicely"
+    pf   = push --force-with-lease
     # To force a rewrite in history
     # Need to follow by an upstream branch name
     rh    = reset --hard
@@ -153,6 +166,15 @@
                }; f"
     cor = ! git recentco
 
+    filesize = "! f() { \
+                git rev-list --objects --all | \
+                git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | \
+                sed -n 's/^blob //p' | \
+                sort --numeric-sort --key=2 | \
+                cut -c 1-12,41- | \
+                $(command -v gnumfmt || echo numfmt) --field=2 --to=iec-i --suffix=B --padding=7 --round=nearest; \
+               }; f"
+
     # Diff Unmerged Name Only
     # --diff-filter=[ACDMRTUXB*]
     # Select only files that are Added (A), Copied (C), Deleted (D),
@@ -172,6 +194,14 @@
     substat   = submodule status
     subup     = submodule update --init
     subprune  = submodule foreach git remote prune origin
+    sublist   = "!f() { \
+                 git config --file .gitmodules --get-regexp path \
+                 | awk '{ print $2 }'; \
+                 }; f"
+    subrel    = "!f() { \
+                 git config --file .gitmodules --get-regexp url\
+                 | awk '{ print $2 }' | grep '^../'; \
+                 }; f"
 
 # via @afuller
     # git rebase -i HEAD~n --onto origin/release/19.08
@@ -286,9 +316,19 @@
     conflictstyle = diff3
     # At teradici people typically git fetch --all; git co master; git pull;
     # git co feature/bug; git merge master;
+    # How to fix a merge conflict:
+    # git co origin/master
+    # git fetch --all
+    # git pull
+    # git co -b <fix_branch_name>
+    # git merge origin/release/21.10
+    # <resolove conflicts>
+    # git push
+    # create PR.
 
 [push]
     default = simple
+    recurseSubmodules = check
 
 [pull]
     rebase = true
@@ -299,3 +339,9 @@
 [user]
     name = <YOUR NAME>
     email = <your user>@teradici.com
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
