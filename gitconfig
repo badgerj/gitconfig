@@ -8,7 +8,10 @@
     bla = branch -a
     blr = branch -l 'release/*' --sort=-version:refname
     # gets the default branch (via stackoverflow: https://stackoverflow.com/questions/28666357/how-to-get-default-git-branch)
+    # use this for local calculations (fast)
     bdefault = "! f() { git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'; }; f"
+    # use this for remoe calculations (more accurate)
+    bdefrem = "! f() { git remote show $1 | grep 'HEAD branch' | sed 's/.*: //'; }; f"
 
     ################
     # Commit related
